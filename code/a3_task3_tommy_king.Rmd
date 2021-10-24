@@ -1,0 +1,54 @@
+---
+title: "Assignment 3 Task 3"
+author: "Tommy King"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+ 
+```{r}
+# installing necessary packages
+library(here)
+library(tidyverse)
+library(janitor)
+```
+
+### Reading in the urchins data and making lower snake case
+```{r}
+urchins <- read_csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+```
+
+# Section 1: Purple and Red Urchin Size Comparisons
+### Includes data from all sites and for both treatments 
+```{r}
+urchins_size_comp <- urchins %>% 
+  select(size, common_name) %>% 
+  group_by(common_name, size) 
+# specifying which variables in the data set to focus on
+```
+
+```{r}
+ggplot(data = urchins_size_comp, #creating ggplot from urchins_size_comp
+       aes(x = size)) + # specifying which values to graph
+  geom_histogram(aes(fill = common_name), bins = 12, color = 4) + # creating a histogram with color by the type of urchin, 12 bins per urchin, with a distinct border
+  facet_wrap(~ common_name) + # creating faceted element to graph to separate by name of urchin
+  labs( y = "Count of Urchins in Sample", 
+        x = "Size of Urchin Diameter (cm) to nearest 0.5 cm",
+        title = "Size of Purple and Red Urchin diameter (cm)", 
+        caption = "Figure 1: Size of Purple and Red Urchin measured by
+        diameters in cm: Count of Purple and Red Urchins by meauring
+        diameter of each in centimeters to the nearest half centimeter
+        to show relationship between type of urchin and size. 
+        Purple Urchins tend to have more individuals between 4 and 6 cm,
+        while Red Urchins have more normally distributed sizes with less
+        of a distinct trend towards one size value.") + #adding visually appealing details for axis and titles and caption
+  theme(plot.caption = element_text(hjust = 0)) + #left aligning caption
+  guides(fill = guide_legend(title = "Type of Urchin")) #changing legend title
+           
+        
+```
+
