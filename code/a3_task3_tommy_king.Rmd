@@ -14,6 +14,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(here)
 library(tidyverse)
 library(janitor)
+library(kableExtra)
+library(DT)
+library(knitr)
+library(lubridate)
+library(plotly)
 ```
 
 ### Reading in the urchins data and making lower snake case
@@ -31,6 +36,7 @@ urchins_size_comp <- urchins %>%
 # specifying which variables in the data set to focus on
 ```
 
+## Data Visualization of Red and Purple Urchin Sizes in cm
 ```{r}
 ggplot(data = urchins_size_comp, #creating ggplot from urchins_size_comp
        aes(x = size)) + # specifying which values to graph
@@ -48,7 +54,82 @@ ggplot(data = urchins_size_comp, #creating ggplot from urchins_size_comp
         of a distinct trend towards one size value.") + #adding visually appealing details for axis and titles and caption
   theme(plot.caption = element_text(hjust = 0)) + #left aligning caption
   guides(fill = guide_legend(title = "Type of Urchin")) #changing legend title
-           
-        
 ```
 
+## Adding descriptive statistics table for mean, median, standard deviation, and sample size for urchins data
+```{r}
+urchins_stats <- urchins %>% 
+  group_by(common_name) %>% 
+  summarize(mean = signif(mean(size),3), 
+            median = signif(median(size),3), 
+            stdev = signif(sd(size),3), 
+            sample_size = n())
+
+  kable(urchins_stats, 
+        caption = "Table 1: Purple and Red Urchin Statistics: Depiction of important statistics for population samples of Red and Purple Urchins along the Santa Barbara coast.", 
+        col.names = c("Common Name", "Mean Size (cm)", "Median Size (cm)", "Standard Deviation (cm)", "Sample Size (total number of urchins)")) %>% 
+    kable_styling() 
+    
+
+```
+
+## Reflection and Takeaways from Urchin Data
+From the data, it is quite clear that Red Urchins are quite larger in size (cm) than Purple Urchins, as best seen in the comparison of the mean and median sizes of the urchins. Red urchins had a mean of 6.78cm while Purple Urchins had a mean of 4.47cm. However, it is important to note that the Red Urchins had a a larger standard deviation (1.89 vs. 1.18) meaning the distribution of sizes is less concentrated around the mean value, giving the Purple Urchins a higher central tendency, closer to the mean value.
+
+# Section 2: Explore Purple Urchin Counts by Site and Year
+```{r}
+purple_urchins <- urchins %>% # new dataset from urchins data
+  filter(common_name %in% "Purple Urchin") %>% # filter to only show purple urchins
+  mutate(date = mdy(date)) %>%  #as.Date(date, format = "%m/%d/%Y")) %>% 
+  mutate(year = year(date)) %>% # making new column with year from date
+  mutate(site_full = case_when( # new column with full names as denoted below
+    site %in% "NAPL" ~ "Naples Reef", 
+    site %in% "AQUE" ~ "Arroyo Quemado Reef", 
+    site %in% "CARP" ~ "Carpinteria Reef", 
+    site %in% "MOHK" ~ "Mohawk Reef", 
+    site %in% "IVEE" ~ "Isla Vista Reef")
+  )
+class(date) #checking the class of the date
+
+```
+
+## Creating a table with total number of purple urchins observed by site and year
+```{r}
+purple_urchins_filtered <- purple_urchins %>% # new data set from purple urchins
+  group_by(site, year) %>% # groupin gby site and year
+  select(site, year) %>% # selecting site and year only
+  mutate(total_count = n()) %>% # new column to show total count at each site per year
+  distinct() #getting rid of duplicates
+  
+```
+
+## Making a finalized graph of counts of purple urchins recorded at each site over time
+```{r}
+purple_urchins_graph <- ggplot(data = purple_urchins_filtered, #creating a new graph from filtered purple urchins
+       aes(x = year, y = total_count)) + # specifying axis labels
+  geom_line(aes(color = site)) +  # line graph with color for each line as the sample site
+  labs(x = "Year", # Adding axis labels
+       y = " Total Count", 
+       title = "Counts of Purple Urchins 
+       at Each Site over Time", # adding graph title
+       caption = "Figure 2: Counts of Purple 
+       Urchins at Each Site over Time: Purple
+       Urchin data collection at various sites
+       around Santa Barbara over time, showing
+       which sites had the most samples
+       collected.") + #adding figure caption
+  theme(plot.caption = element_text(hjust = 0)) + #specifying left alignment 
+  theme(plot.title = element_text(hjust = 0)) + # specifying left alignment
+  guides(fill = guide_legend(title = "Sample Site")) #attempting to change name of legend
+
+# ggplotly(purple_urchins_graph) #adding dynamic plotly function to graph
+  purple_urchins_graph #viewing graph
+```
+
+# Reflection and Answering Questions about Graph: 
+This graph probably does not reflect changes in purple urchin population over time. In order for this graph to reflect a decrease in purple urchin population over time, we would have to take into account a number of different factors and data pieces such as: time spent at each site, growth pressures at each site, food sources at each site, and more. These changes observed are likely a result of samples taken at various places around each site and time spent at each site as well as non-constant collection practices. 
+
+
+NOTE: KEEP GETTING ERRORS WHEN USING DYNAMIC CODE SUCH AS KABLE_STYLING AND GGPLOTY: "
+Error in dirname(to) : path too long" 
+ALso cant figure out how to change my date to Date and not read as a function
