@@ -2,13 +2,24 @@
 title: "Assignment 3 Task 4"
 author: "Tommy King"
 date: "10/25/2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    theme: readable
+    number_sections: yes
 ---
-# Task 4: Naples Reef (January 2010) Purple Urchins
-```{r setup, include=FALSE}
+## Overview: 
+This task contains version control, project management, and data wrangling, analysis & visualization skills to explore purple urchins data recorded by Santa Barbara Coastal Long Term Ecological Research program divers at Naples Reef in January 2010. 
+
+## Data Citation: 
+Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b
+
+### Code Setup
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
+### Installing necessary packages
 ```{r}
 #installing necessary packages
 library(tidyverse)
@@ -26,7 +37,7 @@ urchins_2010 <- read_csv(here("data", "urchins.csv")) %>%
   clean_names()
 ```
 
-### Data Wrangling for Purple Urchins in 2010
+# Data Wrangling for Observations of Naples Reef Purple Urchins in 2010
 ```{r}
 urchins_year2010 <- urchins_2010 %>% 
   mutate(date = mdy(date)) %>%  #formatting date as a date
@@ -37,7 +48,7 @@ urchins_year2010 <- urchins_2010 %>%
 
 ```
 
-### Creating faceted histograms and plots for size distribution of Naples in 2010
+## Creating Faceted Histogram and QQ-plots for size distribution of urchins from Naples Reef in 2010
 ```{r}
 ggplot(data = urchins_year2010, aes(x = size)) + #creating a ggplot for 2010 NAPL urchin data
   geom_histogram(aes(fill = treatment), bins = 12, color = 4) + # creating histogram with specific visual instruction for 12 bins and to contain fill and border for treatment type
@@ -45,12 +56,17 @@ ggplot(data = urchins_year2010, aes(x = size)) + #creating a ggplot for 2010 NAP
   labs(y = "Count of Urchins observed", 
        x = "Size of urchins (cm)", 
        title = "Size Distributions (cm) of Purple Urchins at Naples in 2010") # adding visually appealing axis titles and title
+
+ggplot(data = urchins_year2010, 
+       aes(sample = size)) + 
+  geom_qq(aes(color = treatment)) + 
+  facet_wrap(~ treatment)
 ```
 
-### Main Takeaways from Annual vs Control: 
-Due to the fact that giant kelp acts as habitat and a food source, I would expect that in the Annual facet, in which giant kelp is removed every winter, these urchins will show a smaller distribution of size because they would be more food stressed. Based on this graph, it appears that this is moreso the case, as the mean for size more closely tends towards 3cm in diameter versus for the control mean, it appears to be closer to 4.5cm.
+## Main Takeaways from Annual vs Control: 
+Due to the fact that giant kelp acts as habitat and a food source, I would expect that in the Annual group, in which giant kelp is removed every winter, these urchins will show a smaller distribution of size because they would be more food stressed. Based on this graph, it appears that this is more so the case, as the mean for size more closely tends towards 3cm in diameter versus for the control mean, it appears to be closer to 4.5cm.
 
-### Adding descriptive statistics table for Purple Urchins at Naples Reed in 2010
+# Adding descriptive statistics table for Purple Urchins at Naples Reed in 2010
 ```{r}
 urchins_stats_2010 <- urchins_year2010 %>% # creating new data set
   group_by(treatment) %>%  # grouping by treatment type
@@ -67,7 +83,9 @@ kable(urchins_stats_2010,
       "Median (cm)", 
       "Standard Deviation (cm)", 
       "Sample Size")) %>% # creating dynamic table depicting decriptive statistic variables created above.
-  kable_styling() #adding stylistic aesthetic to table for readability.
+  kable_styling(
+    bootstrap_options = c("bordered", "striped", "hover")) #adding stylistic aesthetic to table for readability.
 
 ```
 
+# END TASK
