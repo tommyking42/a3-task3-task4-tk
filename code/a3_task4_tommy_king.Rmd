@@ -1,0 +1,73 @@
+---
+title: "Assignment 3 Task 4"
+author: "Tommy King"
+date: "10/25/2021"
+output: html_document
+---
+# Task 4: Naples Reef (January 2010) Purple Urchins
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+#installing necessary packages
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+library(knitr)
+library(kableExtra)
+
+```
+
+### Reading in the urchins data
+```{r}
+urchins_2010 <- read_csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+```
+
+### Data Wrangling for Purple Urchins in 2010
+```{r}
+urchins_year2010 <- urchins_2010 %>% 
+  mutate(date = mdy(date)) %>%  #formatting date as a date
+  mutate(year = year(date)) %>% #mutating to add a new column for year
+  filter(year %in% 2010, 
+         site %in% "NAPL", 
+         common_name %in% "Purple Urchin")  # filtering to only show 2010 samples at NAPL site for purple urchins
+
+```
+
+### Creating faceted histograms and plots for size distribution of Naples in 2010
+```{r}
+ggplot(data = urchins_year2010, aes(x = size)) + #creating a ggplot for 2010 NAPL urchin data
+  geom_histogram(aes(fill = treatment), bins = 12, color = 4) + # creating histogram with specific visual instruction for 12 bins and to contain fill and border for treatment type
+  facet_wrap(~ treatment) + # making histogram faceted
+  labs(y = "Count of Urchins observed", 
+       x = "Size of urchins (cm)", 
+       title = "Size Distributions (cm) of Purple Urchins at Naples in 2010") # adding visually appealing axis titles and title
+```
+
+### Main Takeaways from Annual vs Control: 
+Due to the fact that giant kelp acts as habitat and a food source, I would expect that in the Annual facet, in which giant kelp is removed every winter, these urchins will show a smaller distribution of size because they would be more food stressed. Based on this graph, it appears that this is moreso the case, as the mean for size more closely tends towards 3cm in diameter versus for the control mean, it appears to be closer to 4.5cm.
+
+### Adding descriptive statistics table for Purple Urchins at Naples Reed in 2010
+```{r}
+urchins_stats_2010 <- urchins_year2010 %>% # creating new data set
+  group_by(treatment) %>%  # grouping by treatment type
+  summarize(mean = signif(mean(size),3),  # creating new columns for mean, median, standard deviation and sample size of purple urchins
+            median = signif(median(size),3), 
+            stdev = signif(sd(size),3), 
+            sample_size = n())
+
+kable(urchins_stats_2010, 
+      caption = "Table 1: Descriptive Statistics for Purple Urchins collected at Naples Reef (2010): 
+      Important comparative data showing relation of size variables among control group samples (urchins collected in non-removed giant kelp forests) and annual group samples (urchins collected at annual giant kelp removal spots) within Naples Reef in 2010. Variables are measure in centimeters of diameter and depict Annual group of purple urchins is significantly smaller than control group, when their habitat and food source is removed.", 
+      col.names = c("Treatment", 
+      "Mean (cm)",
+      "Median (cm)", 
+      "Standard Deviation (cm)", 
+      "Sample Size")) %>% # creating dynamic table depicting decriptive statistic variables created above.
+  kable_styling() #adding stylistic aesthetic to table for readability.
+
+```
+

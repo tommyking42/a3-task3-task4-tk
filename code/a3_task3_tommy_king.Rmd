@@ -5,7 +5,7 @@ date: "10/24/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
  
@@ -68,7 +68,10 @@ urchins_stats <- urchins %>%
   kable(urchins_stats, 
         caption = "Table 1: Purple and Red Urchin Statistics: Depiction of important statistics for population samples of Red and Purple Urchins along the Santa Barbara coast.", 
         col.names = c("Common Name", "Mean Size (cm)", "Median Size (cm)", "Standard Deviation (cm)", "Sample Size (total number of urchins)")) %>% 
-    kable_styling() 
+    kable_styling(
+      bootstrap_options = c("bordered", "striped", "hover"), 
+      stripe_color = "darkolivegreen3"
+    )
     
 
 ```
@@ -89,11 +92,11 @@ purple_urchins <- urchins %>% # new dataset from urchins data
     site %in% "MOHK" ~ "Mohawk Reef", 
     site %in% "IVEE" ~ "Isla Vista Reef")
   )
-class(date) #checking the class of the date
+
 
 ```
 
-## Creating a table with total number of purple urchins observed by site and year
+## Creating a new dataset with total number of purple urchins observed by site and year
 ```{r}
 purple_urchins_filtered <- purple_urchins %>% # new data set from purple urchins
   group_by(site, year) %>% # groupin gby site and year
@@ -117,19 +120,18 @@ purple_urchins_graph <- ggplot(data = purple_urchins_filtered, #creating a new g
        Urchin data collection at various sites
        around Santa Barbara over time, showing
        which sites had the most samples
-       collected.") + #adding figure caption
+       collected.", 
+       col = "Sample Site") + #adding figure caption
   theme(plot.caption = element_text(hjust = 0)) + #specifying left alignment 
-  theme(plot.title = element_text(hjust = 0)) + # specifying left alignment
-  guides(fill = guide_legend(title = "Sample Site")) #attempting to change name of legend
-
-# ggplotly(purple_urchins_graph) #adding dynamic plotly function to graph
-  purple_urchins_graph #viewing graph
+  theme(plot.title = element_text(hjust = 0))# specifying left alignment
+purple_urchins_graph # visualizing purple urchins graph normally
+ ggplotly(purple_urchins_graph) # adding an option to view the graph with plotly for more readability
+   
+ 
 ```
 
 # Reflection and Answering Questions about Graph: 
 This graph probably does not reflect changes in purple urchin population over time. In order for this graph to reflect a decrease in purple urchin population over time, we would have to take into account a number of different factors and data pieces such as: time spent at each site, growth pressures at each site, food sources at each site, and more. These changes observed are likely a result of samples taken at various places around each site and time spent at each site as well as non-constant collection practices. 
 
 
-NOTE: KEEP GETTING ERRORS WHEN USING DYNAMIC CODE SUCH AS KABLE_STYLING AND GGPLOTY: "
-Error in dirname(to) : path too long" 
-ALso cant figure out how to change my date to Date and not read as a function
+# END TASK
