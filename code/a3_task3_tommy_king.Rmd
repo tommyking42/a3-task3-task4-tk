@@ -2,13 +2,23 @@
 title: "Assignment 3 Task 3"
 author: "Tommy King"
 date: "10/24/2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    theme: readable
+    number_sections: yes
 ---
+## Overview: 
+This task contains version control, project management, and data wrangling, analysis & visualization skills to explore red and purple urchins data recorded by Santa Barbara Coastal Long Term Ecological Research program divers at five different sites along the Santa Barbara coast. 
+
+## Data Citation: 
+Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b
 
 ```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
- 
+
+### Installing necessary packages 
 ```{r}
 # installing necessary packages
 library(here)
@@ -28,7 +38,7 @@ urchins <- read_csv(here("data", "urchins.csv")) %>%
 ```
 
 # Section 1: Purple and Red Urchin Size Comparisons
-### Includes data from all sites and for both treatments 
+## New Dataset that includes data from all sites and for both treatments 
 ```{r}
 urchins_size_comp <- urchins %>% 
   select(size, common_name) %>% 
@@ -41,6 +51,7 @@ urchins_size_comp <- urchins %>%
 ggplot(data = urchins_size_comp, #creating ggplot from urchins_size_comp
        aes(x = size)) + # specifying which values to graph
   geom_histogram(aes(fill = common_name), bins = 12, color = 4) + # creating a histogram with color by the type of urchin, 12 bins per urchin, with a distinct border
+  scale_fill_manual(values = c("purple", "red")) + #changing fill colors to match urchin name
   facet_wrap(~ common_name) + # creating faceted element to graph to separate by name of urchin
   labs( y = "Count of Urchins in Sample", 
         x = "Size of Urchin Diameter (cm) to nearest 0.5 cm",
@@ -83,7 +94,7 @@ From the data, it is quite clear that Red Urchins are quite larger in size (cm) 
 ```{r}
 purple_urchins <- urchins %>% # new dataset from urchins data
   filter(common_name %in% "Purple Urchin") %>% # filter to only show purple urchins
-  mutate(date = mdy(date)) %>%  #as.Date(date, format = "%m/%d/%Y")) %>% 
+  mutate(date = mdy(date)) %>%  #convert the date to class "Date"
   mutate(year = year(date)) %>% # making new column with year from date
   mutate(site_full = case_when( # new column with full names as denoted below
     site %in% "NAPL" ~ "Naples Reef", 
@@ -103,6 +114,7 @@ purple_urchins_filtered <- purple_urchins %>% # new data set from purple urchins
   select(site, year) %>% # selecting site and year only
   mutate(total_count = n()) %>% # new column to show total count at each site per year
   distinct() #getting rid of duplicates
+ # purple_urchins_filtered # visualizing basic table for next step
   
 ```
 
@@ -130,7 +142,7 @@ purple_urchins_graph # visualizing purple urchins graph normally
  
 ```
 
-# Reflection and Answering Questions about Graph: 
+## Reflection and Answering Questions about Graph: 
 This graph probably does not reflect changes in purple urchin population over time. In order for this graph to reflect a decrease in purple urchin population over time, we would have to take into account a number of different factors and data pieces such as: time spent at each site, growth pressures at each site, food sources at each site, and more. These changes observed are likely a result of samples taken at various places around each site and time spent at each site as well as non-constant collection practices. 
 
 
