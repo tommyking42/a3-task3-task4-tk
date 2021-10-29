@@ -134,8 +134,10 @@ purple_urchins_graph <- ggplot(data = purple_urchins_filtered, #creating a new g
        which sites had the most samples
        collected.", 
        col = "Sample Site") + #adding figure caption
+  scale_x_continuous(breaks = 2008:2020) +
   theme(plot.caption = element_text(hjust = 0)) + #specifying left alignment 
-  theme(plot.title = element_text(hjust = 0))# specifying left alignment
+  theme(plot.title = element_text(hjust = 0)) +# specifying left alignment
+  facet_wrap(~ site)
 purple_urchins_graph # visualizing purple urchins graph normally
  ggplotly(purple_urchins_graph) # adding an option to view the graph with plotly for more readability
    
