@@ -110,8 +110,8 @@ purple_urchins <- urchins %>% # new dataset from urchins data
 ## Creating a new dataset with total number of purple urchins observed by site and year
 ```{r}
 purple_urchins_filtered <- purple_urchins %>% # new data set from purple urchins
-  group_by(site, year) %>% # groupin gby site and year
-  select(site, year) %>% # selecting site and year only
+  group_by(site_full, year) %>% # groupin gby site and year
+  select(site_full, year) %>% # selecting site and year only
   mutate(total_count = n()) %>% # new column to show total count at each site per year
   distinct() #getting rid of duplicates
  # purple_urchins_filtered # visualizing basic table for next step
@@ -122,7 +122,7 @@ purple_urchins_filtered <- purple_urchins %>% # new data set from purple urchins
 ```{r}
 purple_urchins_graph <- ggplot(data = purple_urchins_filtered, #creating a new graph from filtered purple urchins
        aes(x = year, y = total_count)) + # specifying axis labels
-  geom_line(aes(color = site)) +  # line graph with color for each line as the sample site
+  geom_line(aes(color = site_full)) +  # line graph with color for each line as the sample site
   labs(x = "Year", # Adding axis labels
        y = " Total Count", 
        title = "Counts of Purple Urchins 
@@ -134,14 +134,13 @@ purple_urchins_graph <- ggplot(data = purple_urchins_filtered, #creating a new g
        which sites had the most samples
        collected.", 
        col = "Sample Site") + #adding figure caption
-  scale_x_continuous(breaks = 2008:2020) +
   theme(plot.caption = element_text(hjust = 0)) + #specifying left alignment 
   theme(plot.title = element_text(hjust = 0)) +# specifying left alignment
-  facet_wrap(~ site)
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018, 2020)) +
+  scale_y_continuous(breaks = c(0, 250, 500, 750, 1000, 1250)) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  facet_wrap(~ site_full, scales = 'free')
 purple_urchins_graph # visualizing purple urchins graph normally
- ggplotly(purple_urchins_graph) # adding an option to view the graph with plotly for more readability
-   
- 
 ```
 
 ## Reflection and Answering Questions about Graph: 
